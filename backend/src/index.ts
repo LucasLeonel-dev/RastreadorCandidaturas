@@ -2,8 +2,6 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import autoload from "@fastify/autoload";
 import path from "node:path";
-import log from "consola";
-import { process } from "zod/v4/core";
 
 const app = fastify();
 app.register(cors, {origin: "*"});
@@ -12,14 +10,21 @@ app.register(autoload, {
     routeParams: true
 });
 
+app.get('/', () => {
+    return "rota raiz"
+})
+
+app.get('/health', ()=> {
+    return 'Hello NLW'
+} ) //endereco health vai mandar hello nlw para tela
+//cada rota devera realizar alguma operacao 
+
 app.addHook("onRoute",({ method , path }) => {
     if (method === "HEAD" || method === "OPTIONS") return; 
-    log.success(`${method} ${path}`)
+    console.log(`${method} ${path}`)
 });
 
-const port = 3000; 
-
-await app.listen({port, host: "0.0.0.0"}).catch(err => {
-    log.error(err);
+ 
+await app.listen({port: 3333}).then(() => { //quando rodar ent...
+    console.log("HTTP server running!")
 })
-log.success(`Server listening on ${port}`); 

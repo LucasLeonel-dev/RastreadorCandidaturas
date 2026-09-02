@@ -2,13 +2,32 @@ import fastify from "fastify";
 import cors from "@fastify/cors";
 import autoload from "@fastify/autoload";
 import path from "node:path";
+import fastifySwagger from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
+import jwtPlugin from "./plugins/jwt.js";
 
 const app = fastify();
 app.register(cors, {origin: "*"});
+
+app.register(jwtPlugin);
+
 app.register(autoload, {
     dir:path.join(import.meta.dirname, "routes"),
     routeParams: true
 });
+
+app.register(fastifySwagger, {
+    openapi: {
+        info: {
+            title: "Application tracker",
+            version: "1.0.0"
+        }
+    }
+})
+
+app.register(fastifySwaggerUi, {
+    routePrefix: '/docs',
+})
 
 app.get('/', () => {
     return "rota raiz"
@@ -19,12 +38,6 @@ app.get('/health', ()=> {
 } ) //endereco health vai mandar hello nlw para tela
 //cada rota devera realizar alguma operacao 
 
-app.addHook("onRoute",({ method , path }) => {
-    if (method === "HEAD" || method === "OPTIONS") return; 
-    console.log(`${method} ${path}`)
-});
-
- 
 await app.listen({port: 3333}).then(() => { //quando rodar ent...
     console.log("HTTP server running!")
 })
